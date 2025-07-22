@@ -1,0 +1,189 @@
+default_settings: null
+behaviors:
+  CEDRL:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 2048
+      buffer_size: 20480
+      learning_rate: 0.0003
+      beta: 0.0075
+      epsilon: 0.2
+      lambd: 0.95
+      num_epoch: 3
+      learning_rate_schedule: linear
+    network_settings:
+      normalize: false
+      hidden_units: 256
+      num_layers: 3
+      vis_encode_type: simple
+      memory: null
+      goal_conditioning_type: hyper
+    reward_signals:
+      extrinsic:
+        gamma: 0.995
+        strength: 1.0
+    init_path: null
+    keep_checkpoints: 10
+    checkpoint_interval: 10000000
+    max_steps: 500000000
+    time_horizon: 2048
+    summary_freq: 100000
+    threaded: false
+    self_play: null
+    behavioral_cloning: null
+env_settings:
+  env_path: null
+  env_args: null
+  base_port: 5005
+  num_envs: 1
+  seed: -1
+engine_settings:
+  width: 84 
+  height: 84
+  quality_level: 5
+  time_scale: 1
+  target_frame_rate: -1
+  capture_frame_rate: 60
+  no_graphics: true
+environment_parameters:
+  fading_step:
+    curriculum:
+      - name: l0
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.1
+        value: 0.75
+      - name: l1
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.14
+        value: 0.71
+      - name: l2
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.18
+        value: 0.68
+      - name: l3
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.22
+        value: 0.64
+      - name: l4
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.26
+        value: 0.6
+      - name: l5
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.3
+        value: 0.57
+      - name: l6
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.34
+        value: 0.53
+      - name: l7
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.38
+        value: 0.5
+      - name: l8
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.42
+        value: 0.46
+      - name: l9
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.46
+        value: 0.42
+      - name: l10
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.5
+        value: 0.39
+      - name: l11
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.54
+        value: 0.35
+      - name: l12
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.58
+        value: 0.32
+      - name: l13
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.62
+        value: 0.28
+      - name: l14
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.66
+        value: 0.25
+      - name: l15
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.7
+        value: 0.21
+      - name: l16
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.74
+        value: 0.18
+      - name: l17
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.78
+        value: 0.14
+      - name: l18
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.82
+        value: 0.11
+      - name: l19
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.86
+        value: 0.07
+      - name: l20
+        completion_criteria:
+          measure: progress
+          behavior: CEDRL
+          threshold: 0.9
+        value: 0.04
+
+checkpoint_settings:
+  run_id: ppo
+  initialize_from: null
+  load_model: false
+  resume: false
+  force: true
+  train_model: false
+  inference: false
+  results_dir: results
+torch_settings:
+  device: cuda
+debug: false

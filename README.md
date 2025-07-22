@@ -5,10 +5,6 @@
 [EUROGRAPHICS 2025] Computer Graphics Forum, Volume 44, Issue 2., May 2025</br>
 </div>
 
-<div align="center">
-<h2>Source Code Coming Soon!</h2>
-</div>
-
 ![Demo Image](https://github.com/veupnea/CEDRL/blob/main/Images/teaser.png)
 
 <p align="justify">
