@@ -3,7 +3,7 @@
 <strong><a href="https://www.apanayiotou.com/" target="_blank">Andreas Panayiotou</a>, <a href="http://www.andreasaristidou.com/" target="_blank">Andreas Aristidou</a>, and <a href="https://totis77.github.io/" target="_blank">Panayiotis Charalambous</a>
 
 EUROGRAPHICS 2025</br>
-Computer Graphics Forum, Volume 44, Issue 2., May 2025</strong></br>
+Computer Graphics Forum, Volume 44, Issue 2, May 2025</strong></br>
 </div>
 
 ![Demo Image](https://github.com/veupnea/CEDRL/blob/main/Images/teaser.png)
