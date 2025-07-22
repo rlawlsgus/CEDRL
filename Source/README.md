@@ -68,3 +68,8 @@ Two Unity scenes are configured for inference:
 
 ---
 
+## 🙏 Acknowledgments
+
+The RVO components in this project are built upon the [A* Pathfinding Porject Pro](https://arongranberg.com/astar), created by Aron Granberg.
+
+
