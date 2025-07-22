@@ -30,6 +30,23 @@ The level of realism in virtual crowds is strongly affected by the presence of d
 	</a>
 </p>
 
+### 📖 Citation
+```bibtex
+@article{Panayiotou2025CEDRL,
+  author = {Panayiotou, A. and Aristidou, A. and Charalambous, P.},
+  title = {CEDRL: Simulating Diverse Crowds with Example-Driven Deep Reinforcement Learning},
+  journal = {Computer Graphics Forum},
+  volume = {44},
+  number = {2},
+  pages = {e70015},
+  keywords = {CCS Concepts, • Computing methodologies → Reinforcement learning, Sequential decision making, Real-time simulation, Animation},
+  doi = {https://doi.org/10.1111/cgf.70015},
+  url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/cgf.70015},
+  year = {2025}
+}
+
+```
+
 
 
 
