@@ -1,5 +1,0 @@
-venv\Scripts\activate
-
-mlagents-learn config/config.yaml --num-envs=32 --env=./CEDRL-Unity/Builds/CEDRL-Unity.exe --run-id=CEDRL_train --resume
-tensorboard --logdir results --port 6006
-http://localhost:6006/
