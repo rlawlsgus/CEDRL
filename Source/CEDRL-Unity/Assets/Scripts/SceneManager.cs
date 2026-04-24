@@ -10,7 +10,8 @@ public enum SceneSetup
 {
     Training,
     Default,
-    Infinite
+    Infinite,
+    CustomCity
 }
 
 public enum DatasetSelector
@@ -121,6 +122,17 @@ public class SceneManager : Singleton<SceneManager>
 
     private void SpawnEnvironments()
     {
+        if (Setup == SceneSetup.CustomCity)
+        {
+            Environment existingEnv = FindObjectOfType<Environment>();
+            if (existingEnv != null)
+            {
+                string dataset = datasets[m_datasetIndex % datasets.Count];
+                existingEnv.InitializeEnvironment(dataset, 0, m_loadedDatasets[dataset], "Inference", Setup, m_spawnSceneObjects);
+                return;
+            }
+        }
+
         for (int i = 0; i < m_quanity; i++)
         {
             Environment env = Instantiate(m_envPrefab, Vector3.zero, Quaternion.identity, transform).GetComponent<Environment>();

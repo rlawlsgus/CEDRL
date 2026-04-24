@@ -130,7 +130,10 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
             m_trailRenderer = transform.Find("Trail").GetComponent<TrailRenderer>();
         
         m_manager = SceneManager.Instance;
-        m_env = transform.parent.parent.GetComponent<Environment>();
+        
+        // Find Environment more robustly
+        if (m_env == null)
+            m_env = GetComponentInParent<Environment>();
         
         m_rvoController.enabled = false;
         m_saveList = new List<SaveData>();

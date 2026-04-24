@@ -3,8 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Pathfinding.RVO;
-using UnityEditor;
-using Random = System.Random;
+
+[Serializable]
+public class AgentPointPair
+{
+    public Transform startPoint;
+    public Transform goalPoint;
+    public float spawnTime = 0f;
+}
 
 public class Environment : MonoBehaviour
 {
@@ -26,26 +32,39 @@ public class Environment : MonoBehaviour
     private bool m_manualSpawning;
     [SerializeField] private Vector4 m_floorEdges;
     
+    [Header("Custom City Settings")]
+    [SerializeField] private bool m_useDatasetInCustomCity; 
+    [SerializeField] private List<AgentPointPair> m_manualCityAgents;
+    [SerializeField] private Transform m_agentRoot;
+    [SerializeField] private Vector3 m_datasetPositionOffset; 
+    [SerializeField] private Vector3 m_datasetScale = Vector3.one;
+
     public void InitializeEnvironment(string d, float height, CSVLoader dataLoader, string mode, SceneSetup setup, bool sceneObjects)
     {
         float heightScale = 5f;
         Height = height * heightScale;
         
         dataset = d;
-        //Load Data from CSV files
         m_realAgentsData = dataLoader.agents;
         m_maxTimestep = dataLoader.MaxTimestep;
 
-        // Adjust the scale of the floor
-        Floor = transform.GetChild(0);
-        float floorWidth = dataLoader.MaxX - dataLoader.MinX + 3f;
-        float floorHeight = dataLoader.MaxZ - dataLoader.MinZ + 3f;
-        float scaleX = floorWidth / 10.0f;
-        float scaleZ = floorHeight / 10.0f;
-        Floor.localScale = new Vector3(scaleX, 1, scaleZ);
-        transform.position = new Vector3(0f, Height, 0f);
-        maxDistance = Mathf.Sqrt((scaleX * 10f) * (scaleX * 10f) + (scaleZ * 10f) * (scaleZ * 10f));
-        m_floorEdges = new Vector4(-(floorWidth / 2), (floorWidth / 2), -(floorHeight / 2), (floorHeight / 2));
+        if (setup != SceneSetup.CustomCity)
+        {
+            Floor = transform.GetChild(0);
+            float floorWidth = dataLoader.MaxX - dataLoader.MinX + 3f;
+            float floorHeight = dataLoader.MaxZ - dataLoader.MinZ + 3f;
+            float scaleX = floorWidth / 10.0f;
+            float scaleZ = floorHeight / 10.0f;
+            Floor.localScale = new Vector3(scaleX, 1, scaleZ);
+            maxDistance = Mathf.Sqrt((scaleX * 10f) * (scaleX * 10f) + (scaleZ * 10f) * (scaleZ * 10f));
+            m_floorEdges = new Vector4(-(floorWidth / 2), (floorWidth / 2), -(floorHeight / 2), (floorHeight / 2));
+            
+            transform.position = new Vector3(0f, Height, 0f);
+        }
+        else
+        {
+            maxDistance = 100f * Mathf.Max(m_datasetScale.x, m_datasetScale.z); 
+        }
         
         if (String.Compare(mode, "Training", StringComparison.Ordinal) == 0)
         {
@@ -54,12 +73,23 @@ public class Environment : MonoBehaviour
         }
         else
         {
-            if(sceneObjects)
+            if(sceneObjects && setup != SceneSetup.CustomCity)
                 BuildSceneObjects(d);
             InferenceSetup(setup);
         }
 
         ready = true;
+    }
+
+    public Vector3 TransformDatasetPosition(Vector3 pos)
+    {
+        Vector3 transformed = new Vector3(
+            pos.x * m_datasetScale.x,
+            pos.y * m_datasetScale.y,
+            pos.z * m_datasetScale.z
+        );
+        transformed += m_datasetPositionOffset;
+        return transformed;
     }
 
     private void TrainingSetup()
@@ -70,7 +100,6 @@ public class Environment : MonoBehaviour
         {
             if (SceneManager.Instance.IsInfernce == false)
             {
-                // If real agent has enough trajectory, spawn a CEDRL_Agent
                 if (agentData.Positions.Count >= 20)
                 {
                     RealAgent realAgent = Instantiate(m_realAgentPrefab, AdjustHeight(agentData.Positions[0]),
@@ -101,22 +130,59 @@ public class Environment : MonoBehaviour
     {
         m_realAgents = new List<RealAgent>(m_realAgentsData.Count);
         m_CEDRL_Agents = new List<CEDRL_Agent>(m_realAgentsData.Count);
+        
+        Transform parentTransform = (m_agentRoot != null) ? m_agentRoot : transform.GetChild(2);
+        float agentScale = 0.7f;
 
-        if (setup == SceneSetup.Default)
+        if (setup == SceneSetup.Default || (setup == SceneSetup.CustomCity && m_useDatasetInCustomCity))
         {
-            foreach (Transform wall in transform.Find("Floor"))
+            Transform floorTransform = transform.Find("Floor");
+            if (floorTransform != null)
             {
-                wall.gameObject.layer = 0;
+                foreach (Transform wall in floorTransform)
+                {
+                    wall.gameObject.layer = 0;
+                }
             }
             
             foreach (var agentData in m_realAgentsData)
             {
-                CEDRL_Agent CEDRL_Agent = Instantiate(m_CEDRL_AgentInferencePrefab, agentData.Positions[0],
-                    Quaternion.identity, transform.GetChild(2)).GetComponent<CEDRL_Agent>();
+                Vector3 startPos = TransformDatasetPosition(agentData.Positions[0]);
+                Vector3 goalPos = TransformDatasetPosition(agentData.Positions[^1]);
+
+                GameObject agentObj = Instantiate(m_CEDRL_AgentInferencePrefab, startPos,
+                    Quaternion.identity, parentTransform);
+                agentObj.transform.localScale = new Vector3(agentScale, agentScale, agentScale);
+                var rvo = agentObj.GetComponent<RVOController>();
+                if(rvo != null) rvo.radius *= agentScale;
+
+                CEDRL_Agent CEDRL_Agent = agentObj.GetComponent<CEDRL_Agent>();
                 CEDRL_Agent.name = "CEDRL_Agent_" + agentData.ID;
-                CEDRL_Agent.SetData(agentData.ID, agentData.TimeSteps[0], AdjustHeight(agentData.Positions[0]),
-                    AdjustHeight(agentData.Positions[^1]), agentData.Scores,0, this, null, setup, true);
+                CEDRL_Agent.SetData(agentData.ID, agentData.TimeSteps[0], startPos,
+                    goalPos, agentData.Scores, 0, this, null, setup, true);
                 m_CEDRL_Agents.Add(CEDRL_Agent);
+            }
+        }
+        else if (setup == SceneSetup.CustomCity && !m_useDatasetInCustomCity)
+        {
+            for (int i = 0; i < m_manualCityAgents.Count; i++)
+            {
+                var pair = m_manualCityAgents[i];
+                if (pair.startPoint == null || pair.goalPoint == null) continue;
+
+                GameObject agentObj = Instantiate(m_CEDRL_AgentInferencePrefab, pair.startPoint.position,
+                    pair.startPoint.rotation, parentTransform);
+                agentObj.transform.localScale = new Vector3(agentScale, agentScale, agentScale);
+                var rvo = agentObj.GetComponent<RVOController>();
+                if(rvo != null) rvo.radius *= agentScale;
+
+                CEDRL_Agent agent = agentObj.GetComponent<CEDRL_Agent>();
+                agent.name = "CityAgent_" + i;
+                AgentScores dummyScores = new AgentScores { Norm_score = SceneManager.Instance.Complexity };
+                
+                agent.SetData(i, pair.spawnTime, pair.startPoint.position,
+                    pair.goalPoint.position, dummyScores, 0, this, null, setup, true);
+                m_CEDRL_Agents.Add(agent);
             }
         }
         else if (setup == SceneSetup.Infinite)
@@ -165,12 +231,15 @@ public class Environment : MonoBehaviour
                         spawnPoint = groupCenter + offset;
                         Collider[] hitColliders = Physics.OverlapSphere(spawnPoint, checkRadius, layerMask);
                         isPointFree = hitColliders.Length == 0;
-                        if(hitColliders.Length > 0)
-                            print("hit");
                     }
                     
-                    CEDRL_Agent CEDRL_Agent = Instantiate(m_CEDRL_AgentInferencePrefab, agentData.Positions[0],
-                        Quaternion.identity, transform.GetChild(2)).GetComponent<CEDRL_Agent>();
+                    GameObject agentObj = Instantiate(m_CEDRL_AgentInferencePrefab, agentData.Positions[0],
+                        Quaternion.identity, parentTransform);
+                    agentObj.transform.localScale = new Vector3(agentScale, agentScale, agentScale);
+                    var rvo = agentObj.GetComponent<RVOController>();
+                    if(rvo != null) rvo.radius *= agentScale;
+
+                    CEDRL_Agent CEDRL_Agent = agentObj.GetComponent<CEDRL_Agent>();
                     CEDRL_Agent.name = "CEDRL_Agent_" + agentData.ID;
                     goalPoint *= UnityEngine.Random.Range(0.9f, 1.1f);
                     CEDRL_Agent.SetData(agentData.ID, agentData.TimeSteps[0], spawnPoint,
@@ -202,16 +271,48 @@ public class Environment : MonoBehaviour
 
         do
         {
-            // Generate a random point within the plane's bounds
             float x = UnityEngine.Random.Range(-width, width);
             float z = UnityEngine.Random.Range(-height, height);
             randomPoint = AdjustHeight(new Vector3(x, 0, z));
-            // Check for obstructions using a sphere cast
             isFree = !Physics.CheckSphere(randomPoint, checkRadius, obstructionLayer);
         } while (!isFree);
         return randomPoint;
     }
     
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying && (m_realAgentsData == null || m_realAgentsData.Count == 0))
+        {
+            if (!string.IsNullOrEmpty(dataset))
+            {
+                try 
+                {
+                    CSVLoader loader = new CSVLoader();
+                    loader.LoadCSVData(dataset, 0);
+                    m_realAgentsData = loader.agents;
+                }
+                catch { /* Ignore error in Edit Mode */ }
+            }
+        }
+
+        if (m_realAgentsData == null || m_realAgentsData.Count == 0) return;
+
+        foreach (var agent in m_realAgentsData)
+        {
+            if (agent.Positions != null && agent.Positions.Count > 0)
+            {
+                Vector3 start = TransformDatasetPosition(agent.Positions[0]);
+                Vector3 end = TransformDatasetPosition(agent.Positions[^1]);
+                
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(start, 0.3f);
+                
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(end, 0.3f);
+            }
+        }
+    }
+
     private Vector3 GetRandomEdgePoint(Transform floor)
     {
         Vector3 scale = floor.localScale;
@@ -221,19 +322,19 @@ public class Environment : MonoBehaviour
         float x = 0, z = 0;
         switch (side)
         {
-            case 0: // Top side
+            case 0:
                 x = UnityEngine.Random.Range(-width, width);
                 z = height;
                 break;
-            case 1: // Bottom side
+            case 1:
                 x = UnityEngine.Random.Range(-width, width);
                 z = -height;
                 break;
-            case 2: // Right side
+            case 2:
                 x = width;
                 z = UnityEngine.Random.Range(-height, height);
                 break;
-            case 3: // Left side
+            case 3:
                 x = -width;
                 z = UnityEngine.Random.Range(-height, height);
                 break;
@@ -250,7 +351,6 @@ public class Environment : MonoBehaviour
                 if(agent.enabled)
                     agent.FinishEpisode(false);
             }
-            //EditorApplication.isPlaying = false;
         }
         
         foreach (var agent in m_realAgents)
@@ -321,7 +421,6 @@ public class Environment : MonoBehaviour
 
         if (prefab != null)
         {
-            // Instantiate the prefab
             GameObject instantiatedObject = Instantiate(prefab, transform.Find("SceneObjects"));
             instantiatedObject.name = prefab.name;
         }
@@ -360,7 +459,7 @@ public class Environment : MonoBehaviour
         {
             foreach (var a in m_realAgentsData)
             {
-                Gizmos.DrawCube(a.Positions[0], new Vector3(0.1f, 0.1f, 0.1f));
+                Gizmos.DrawCube(TransformDatasetPosition(a.Positions[0]), new Vector3(0.1f, 0.1f, 0.1f));
             }
         }
     }
