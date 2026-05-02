@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2328719099828488836}
   - component: {fileID: 151470820533740186}
   - component: {fileID: 690879754296566053}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_Plates
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 1572685998036182810}
   - component: {fileID: 2690157427880520822}
   - component: {fileID: 8719594295122498909}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_Glass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 3043484946616745732}
   - component: {fileID: 5359245863966370630}
   - component: {fileID: 5641468570484469204}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_SteeringW
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,7 +260,7 @@ GameObject:
   - component: {fileID: 8496901079313636612}
   - component: {fileID: 7152503301967207539}
   - component: {fileID: 2675917680920451625}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Steering_Wheel_08
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,7 +344,7 @@ GameObject:
   - component: {fileID: 6677420086246471498}
   - component: {fileID: 1781646499418502702}
   - component: {fileID: 3654702215343263863}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_Wheel_rl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 6220291007354922519}
   - component: {fileID: 4181237450175514584}
   - component: {fileID: 764442466135754181}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_Wheel_fl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -554,7 +554,7 @@ GameObject:
   - component: {fileID: 5140909190534618260}
   - component: {fileID: 8657095841861604981}
   - component: {fileID: 1017628516926489877}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_Wheel_fr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -659,7 +659,7 @@ GameObject:
   - component: {fileID: 4753477183745274939}
   - component: {fileID: 8222208376855832076}
   - component: {fileID: 6900228306320773306}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_Wheel_rr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -765,9 +765,9 @@ GameObject:
   - component: {fileID: 1147957209634884822}
   - component: {fileID: 2695269681461804814}
   - component: {fileID: 4328659075345797974}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Sedan_12
-  m_TagString: Vehicle
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -825,7 +825,7 @@ MonoBehaviour:
   stopDistance: 5
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 512
   rayOffset: {x: 0, y: 1, z: 0}
   currentSpeed: 0
   distanceTraveled: 0

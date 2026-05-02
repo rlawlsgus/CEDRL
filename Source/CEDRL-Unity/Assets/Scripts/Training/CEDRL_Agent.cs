@@ -14,7 +14,7 @@ public class SaveData
 public class CEDRL_Agent : Unity.MLAgents.Agent
 {
     public int id;
-    
+
     [Header("Movement")]
     [Tooltip("Maximum movement speed")]
     [SerializeField] private float m_moveSpeed = 2.25f;
@@ -50,10 +50,15 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
     [SerializeField] private SceneSetup m_setup;
     [Tooltip("The number of frames that have passed in the current episode")]
     [SerializeField] private int m_frameCounter;
-    
+
     public Vector3 CurrentVelocity { get; private set; }
     public float SpawnTimestep { get; set; }
     public float DrawSpeed { get; set; }
+    public List<Transform> groupMembers = new List<Transform>();
+    
+    [SerializeField] private bool m_goalReached;
+    public bool GoalReached { get => m_goalReached; set => m_goalReached = value; }
+    public Vector3 GoalPos => m_goalPos;
 
     private int m_episode = 0;
     private float m_initialGoalDistance;
@@ -70,23 +75,94 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
     private Vector3 m_lastPos;
     private List<SaveData> m_saveList;
     private bool m_endedFromTime;
+    private Quaternion m_startRotation;
+
+    public override void Initialize()
+    {
+        m_rb = GetComponent<Rigidbody>();
+        m_rvoController = GetComponent<RVOController>();
+        m_visuals = GetComponent<Visuals>();
+        if (transform.Find("Trail") != null)
+            m_trailRenderer = transform.Find("Trail").GetComponent<TrailRenderer>();
+
+        m_manager = SceneManager.Instance;
+
+        // Find Environment more robustly
+        if (m_env == null)
+            m_env = GetComponentInParent<Environment>();
+
+        m_rvoController.enabled = false;
+        m_saveList = new List<SaveData>();
+    }
+
+    public override void OnEpisodeBegin()
+    {
+        // 이미 성공해서 비활성화되는 중이라면 초기화 로직을 건너뜀 (데이터 보존)
+        if (GoalReached) return;
+
+        m_episode++;
+        m_frameCounter = 0;
+        m_saveList.Clear();
+
+        if (!m_manager.IsInfernce)
+            m_startingPos = GetRandomPointInCircle(m_startingPos, 0f);
+
+        transform.position = m_startingPos;
+        transform.rotation = m_startRotation;
+        m_lastPos = transform.position;
+        m_rvoController.enabled = true;
+
+        if (m_trailRenderer != null)
+            m_trailRenderer.Clear();
+
+        if (m_realAgent != null)
+        {
+            transform.LookAt(m_realAgent.InitialLookPoint);
+            float noiseAngle = UnityEngine.Random.Range(-30f, 30f);
+            transform.Rotate(Vector3.up, noiseAngle);
+            m_rb.velocity = transform.forward * m_realAgent.InitialSpeed;
+        }
+        else
+        {
+            if (m_setup is SceneSetup.Infinite)
+            {
+                if (m_episode == 1)
+                {
+                    transform.LookAt(m_goalPos);
+                    m_rb.velocity = transform.forward * UnityEngine.Random.Range(0f, m_moveSpeed);
+                }
+            }
+        }
+
+        m_goalDistance = Vector3.Distance(transform.position, m_goalPos);
+        if (m_setup is SceneSetup.Infinite)
+            m_goalDistance = m_initialGoalDistance;
+
+        Vector3 goalVector = m_goalPos - transform.position;
+        m_goalAngle = Vector3.SignedAngle(transform.forward, goalVector, Vector3.up);
+    }
 
     /// <summary>
     /// Sets the initial data for the agent.
     /// </summary>
-    public void SetData(int agentId, float spawnTime, Vector3 spawn, Vector3 goal, AgentScores scores, 
+    public void SetData(int agentId, float spawnTime, Vector3 spawn, Vector3 goal, AgentScores scores,
         float initialSpeed, Environment env, RealAgent real, SceneSetup setup, bool disable)
     {
         m_env = env;
         id = agentId;
         SpawnTimestep = spawnTime;
         m_startingPos = spawn;
+        m_startRotation = transform.rotation;
         m_goalPos = goal;
         m_initialGoalDistance = Vector3.Distance(spawn, goal);
         m_complexity = scores.Norm_score;
         m_initialSpeed = initialSpeed;
         m_setup = setup;
+        m_goalDistance = Vector3.Distance(spawn, goal);
         
+        // 데이터 주입 시점에 성공 플래그 리셋
+        GoalReached = false;
+
         if (real != null)
         {
             m_realAgent = real;
@@ -98,11 +174,15 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
             m_gridSensor.AgentGameObject = this.gameObject;
             m_raySensor.AgentGameObject = this.gameObject;
         }
-        
-        if(disable)
+
+        // 고유 ID가 부여된 후 SRVR에 등록
+        if (CEDRL_SRVRManager.Instance != null)
+            CEDRL_SRVRManager.Instance.RegisterAgent(this);
+
+        if (disable)
             gameObject.SetActive(false);
     }
-    
+
     /// <summary>
     /// Sets the color of the agent.
     /// </summary>
@@ -120,42 +200,26 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
         m_visuals.GroupColor = c;
         m_visuals.UseGroupColor = true;
     }
-    
-    public override void Initialize()
-    {
-        m_rb = GetComponent<Rigidbody>();
-        m_rvoController = GetComponent<RVOController>();
-        m_visuals = GetComponent<Visuals>();
-        if (transform.Find("Trail") != null)
-            m_trailRenderer = transform.Find("Trail").GetComponent<TrailRenderer>();
-        
-        m_manager = SceneManager.Instance;
-        
-        // Find Environment more robustly
-        if (m_env == null)
-            m_env = GetComponentInParent<Environment>();
-        
-        m_rvoController.enabled = false;
-        m_saveList = new List<SaveData>();
-    }
-    
+
     private void Update()
     {
-        if(m_manager.SaveNow && m_manager.SaveTrajectories)
+        if (m_manager.SaveNow && m_manager.SaveTrajectories)
             FinishEpisode(true);
-        
-        if(m_rvoController == null || !m_rvoController.enabled)
+
+        if (m_rvoController == null || !m_rvoController.enabled)
             return;
-        
+
         Vector3 delta = m_rvoController.CalculateMovementDelta(transform.position, Time.fixedDeltaTime);
         Vector3 newVelocity = delta / Time.fixedDeltaTime;
         m_rb.velocity = newVelocity;
         CurrentVelocity = m_rb.velocity;
         m_currentSpeed = CurrentVelocity.magnitude;
     }
-    
+
     private void FixedUpdate()
     {
+        m_goalDistance = Vector3.Distance(transform.position, m_goalPos);
+
         if (m_manager.IsInfernce)
         {
             if(m_manager.ManualComplexity)
@@ -177,10 +241,10 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
             };
             m_saveList.Add(sd);
         }
-        
+
         m_frameCounter++;
     }
-    
+
     private Vector3 GetRandomPointInCircle(Vector3 center, float radius)
     {
         float angle = UnityEngine.Random.Range(0f, Mathf.PI * 2);
@@ -192,52 +256,10 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
     protected override void OnEnable()
     {
         base.OnEnable();
-        if(m_manager.IsInfernce && m_rvoController != null)
+        if (m_manager.IsInfernce && m_rvoController != null)
         {
             m_rvoController.enabled = true;
         }
-    }
-    
-    public override void OnEpisodeBegin()
-    {
-        m_episode++;
-        m_frameCounter = 0;
-        m_saveList.Clear();
-        
-        if(!m_manager.IsInfernce)
-            m_startingPos = GetRandomPointInCircle(m_startingPos, 0f);
-        
-        transform.position = m_startingPos;
-        m_lastPos = transform.position;
-        m_rvoController.enabled = true;
-        
-        if(m_trailRenderer != null)
-            m_trailRenderer.Clear();
-        
-        if (m_realAgent != null)
-        {
-            transform.LookAt(m_realAgent.InitialLookPoint);
-            float noiseAngle = UnityEngine.Random.Range(-30f, 30f);
-            transform.Rotate(Vector3.up, noiseAngle);
-            m_rb.velocity = transform.forward * m_realAgent.InitialSpeed;
-        }
-        else
-        {
-            if (m_setup is SceneSetup.Infinite){
-                if (m_episode == 1)
-                {
-                    transform.LookAt(m_goalPos);
-                    m_rb.velocity = transform.forward * UnityEngine.Random.Range(0f, m_moveSpeed);
-                }
-            }
-        }
-
-        m_goalDistance = Vector3.Distance(transform.position, m_goalPos);
-        if (m_setup is SceneSetup.Infinite)
-            m_goalDistance = m_initialGoalDistance;
-        
-        Vector3 goalVector = m_goalPos - transform.position;
-        m_goalAngle = Vector3.SignedAngle(transform.forward, goalVector, Vector3.up);
     }
 
     private float RandomizeObservationValue(float value)
@@ -245,18 +267,18 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
         float temp = UnityEngine.Random.Range(0.95f, 1.05f) * value;
         return Mathf.Clamp01(temp);
     }
-    
+
     public override void CollectObservations(VectorSensor sensor)
     {
         var localVelocity = transform.InverseTransformDirection(m_rb.velocity / m_moveSpeed);
         sensor.AddObservation(localVelocity.x);
         sensor.AddObservation(localVelocity.z);
-        
+
         float goalDistanceNorm = m_goalDistance / m_env.maxDistance;
         float goalAngleNorm = ((m_goalAngle / 180f) + 1) / 2f;
         sensor.AddObservation(goalDistanceNorm);
         sensor.AddObservation(goalAngleNorm);
-        
+
         sensor.AddObservation(RandomizeObservationValue(m_complexity));
 
         if (m_realAgent != null && receiveRealObs)
@@ -265,14 +287,14 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
             Vector3 normalizedRelativePos = relativePos / m_env.maxDistance;
             sensor.AddObservation(normalizedRelativePos.x);
             sensor.AddObservation(normalizedRelativePos.z);
-            
+
             Vector3 relativeVel = transform.InverseTransformDirection(m_realAgent.CurrentVelocity - m_rb.velocity);
             sensor.AddObservation(relativeVel.x);
             sensor.AddObservation(relativeVel.z);
-            
+
             float relativeOrientation = (1 - Vector3.Dot(transform.forward, m_realAgent.transform.forward)) / 2;
             sensor.AddObservation(relativeOrientation);
-            
+
             float distanceToRealAgent = normalizedRelativePos.magnitude;
             sensor.AddObservation(distanceToRealAgent);
         }
@@ -281,7 +303,7 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
             sensor.AddObservation(new float[6]);
         }
     }
-    
+
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
         DrawSpeed = (Vector3.Distance(transform.position, m_lastPos) / Time.fixedDeltaTime) / m_moveSpeed;
@@ -295,12 +317,12 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
         AssignSmoothMovementReward(move, turn);
         AssignImitationReward();
     }
-    
+
     private (float, float) CalculateMovement(ActionSegment<float> act)
     {
         float moveInput = RescaleValue(act[0], -1f, 1f, -0.5f, 1f) * m_moveSpeed;
         float turnAmount = Mathf.Clamp(act[1], -1f, 1f);
-        
+
         float turn = turnAmount * m_turnSpeed * Time.fixedDeltaTime;
         transform.Rotate(0, turn, 0);
 
@@ -319,19 +341,19 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
         float normalizedMoveChange = RescaleValue(moveDifference, 0, 1.5f, 0f, 1f);
         float normalizedTurnChange = RescaleValue(turnDifference, 0, 2, 0, 1);
         float combinedChange = (normalizedMoveChange + normalizedTurnChange) / 2;
-        
-        if(combinedChange > 0.5f)
+
+        if (combinedChange > 0.5f)
             AddReward(-0.001f * combinedChange);
 
         m_previousMoveInput = currentMoveInput;
         m_previousTurnAmount = currentTurnAmount;
     }
-    
+
     private void AssignImitationReward()
     {
         if (m_manager.IsInfernce)
         {
-            if (m_goalDistance <= 2f)
+            if (m_goalDistance <= 1f)
             {
                 if (m_setup == SceneSetup.Infinite)
                 {
@@ -343,22 +365,22 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
             }
             return;
         }
-        
+
         float normSpeed = m_rb.velocity.magnitude / m_moveSpeed;
         float normRealSpeed = m_realAgent.CurrentSpeed / m_moveSpeed;
         float velocityDifference = Mathf.Clamp01(Mathf.Abs(normSpeed - normRealSpeed));
         float velocitySimilarity = 1f - Mathf.Sqrt(velocityDifference);
-        
+
         float optimalProximity = 5.0f;
         float distanceToRealAgent = Vector3.Distance(m_realAgent.transform.position, transform.position);
         float proximitySimilarity = 1f - Mathf.Sqrt(Mathf.Clamp01(distanceToRealAgent / optimalProximity));
-        
+
         float deltaOrientation = Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, m_realAgent.transform.eulerAngles.y));
         deltaOrientation /= 180f;
         float orientationSimilarity = 1f - Mathf.Sqrt(Mathf.Clamp01(deltaOrientation));
 
         m_imitationQuality = 0.25f * velocitySimilarity + 0.5f * proximitySimilarity + 0.25f * orientationSimilarity;
-        
+
         float imitationQualityReward = 0.005f * m_complexity * m_imitationQuality;
         AddReward(imitationQualityReward);
 
@@ -369,20 +391,20 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
             FinishEpisode(false);
         }
     }
-    
+
     /// <summary>
     /// Finishes the episode and optionally destroys the agent.
     /// </summary>
     public void FinishEpisode(bool destroy)
     {
         m_frameCounter = 0;
-        
-        if(m_manager.SaveTrajectories)
+
+        if (m_manager.SaveTrajectories)
             m_manager.SaveAgentData(gameObject.name + "_" + m_episode, m_saveList, m_goalPos);
-        
-        if(destroy)
+
+        if (destroy)
             Destroy(this.gameObject);
-        
+
         if (m_setup is SceneSetup.Infinite)
         {
             if (!m_endedFromTime)
@@ -398,13 +420,18 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
         else
         {
             EndEpisode();
-            gameObject.SetActive(false);   
+            gameObject.SetActive(false);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("ObstacleIgnore") || other.gameObject.CompareTag("Obstacle"))
+        if (m_manager.IsInfernce) return;
+
+        int obstacleLayer = LayerMask.NameToLayer("Obstacle");
+        int obstacleIgnoreLayer = LayerMask.NameToLayer("ObstacleIgnore");
+
+        if (other.gameObject.layer == obstacleLayer || other.gameObject.layer == obstacleIgnoreLayer)
         {
             if (StepCount >= 30)
             {
@@ -426,7 +453,7 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
         if (Application.isPlaying)
         {
             Debug.DrawLine(transform.position, m_goalPos, Color.red);
-            if(m_realAgent)
+            if (m_realAgent)
                 Debug.DrawLine(transform.position, m_realAgent.transform.position, m_color);
         }
     }

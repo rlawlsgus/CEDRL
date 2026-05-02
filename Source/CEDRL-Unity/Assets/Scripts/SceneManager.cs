@@ -152,7 +152,7 @@ public class SceneManager : Singleton<SceneManager>
         {
             FadingFactor = Academy.Instance.EnvironmentParameters.GetWithDefault("fading_step", 1.0f);
             StatsRecorder.Add("ObservationFadingStep", FadingFactor);
-        }else{
+        }else if (m_complexityText != null){
             if(ManualComplexity)
                 m_complexityText.text = "Complexity: " + Complexity;
             else

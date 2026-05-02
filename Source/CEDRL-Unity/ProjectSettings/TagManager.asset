@@ -9,6 +9,14 @@ TagManager:
   - RealAgent
   - POI
   - ObstacleIgnore
+  - Building
+  - Entarance
+  - sidewalk
+  - road
+  - crosswalk
+  - Vehicle
+  - inside
+  - Event
   layers:
   - Default
   - TransparentFX
@@ -19,10 +27,10 @@ TagManager:
   - Agents
   - RealAgents
   - EnvironmentDummy
-  - 
-  - 
-  - 
-  - 
+  - Obstacle
+  - Building
+  - Vehicle
+  - Door
   - 
   - 
   - 

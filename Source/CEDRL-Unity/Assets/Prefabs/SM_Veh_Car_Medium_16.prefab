@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2573579010489470570}
   - component: {fileID: 3359768279922336663}
   - component: {fileID: 4488870134690832679}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_Wheel_fr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 7526805310635587252}
   - component: {fileID: 2898592222685665574}
   - component: {fileID: 3024062604390659062}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_Wheel_rl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -221,7 +221,7 @@ GameObject:
   - component: {fileID: 799009871482812559}
   - component: {fileID: 7986535444439842161}
   - component: {fileID: 3023683247008859477}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_Plates
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 9091165138290828652}
   - component: {fileID: 584314918472343541}
   - component: {fileID: 4391974036724804074}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_Glass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -388,7 +388,7 @@ GameObject:
   - component: {fileID: 2705447108247472401}
   - component: {fileID: 1253520827546234372}
   - component: {fileID: 7237106003149781581}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_Wheel_rr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -494,9 +494,9 @@ GameObject:
   - component: {fileID: -5105879905770404078}
   - component: {fileID: 5889037852115907550}
   - component: {fileID: 2486779582238251988}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_16
-  m_TagString: Vehicle
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -553,7 +553,7 @@ MonoBehaviour:
   stopDistance: 5
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 512
   rayOffset: {x: 0, y: 1, z: 0}
   currentSpeed: 0
   distanceTraveled: 0
@@ -634,7 +634,7 @@ GameObject:
   - component: {fileID: 7952182311057054430}
   - component: {fileID: 7643968353568020321}
   - component: {fileID: 7262530350530261773}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_SteeringW
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -718,7 +718,7 @@ GameObject:
   - component: {fileID: 8957037517123906576}
   - component: {fileID: 7654242407177909893}
   - component: {fileID: 5341123093488265880}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Medium_Wheel_fl
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8867747772188722353}
   - component: {fileID: 4274878074847240545}
   - component: {fileID: 5369366257876037700}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_SteeringW
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 7845836611681313978}
   - component: {fileID: 2816722183248216463}
   - component: {fileID: 1725242144622005734}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_Wheel_rl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,7 +199,7 @@ GameObject:
   - component: {fileID: 524681850644488401}
   - component: {fileID: 3263473848824013254}
   - component: {fileID: 232851192107199666}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_Plates
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 2606821517941707890}
   - component: {fileID: 764319710451884180}
   - component: {fileID: 7665559599822266861}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_Glass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -367,9 +367,9 @@ GameObject:
   - component: {fileID: 1247512065005343401}
   - component: {fileID: 5213902908243686570}
   - component: {fileID: 184770411389540436}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_06
-  m_TagString: Vehicle
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -426,7 +426,7 @@ MonoBehaviour:
   stopDistance: 5
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 512
   rayOffset: {x: 0, y: 1, z: 0}
   currentSpeed: 0
   distanceTraveled: 0
@@ -508,7 +508,7 @@ GameObject:
   - component: {fileID: 8809370586664486243}
   - component: {fileID: 2710170354737812583}
   - component: {fileID: 7574451170118555944}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_Wheel_rr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -613,7 +613,7 @@ GameObject:
   - component: {fileID: 1427901927408514801}
   - component: {fileID: 8318851921641739082}
   - component: {fileID: 8369283956914088737}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_Wheel_fl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -718,7 +718,7 @@ GameObject:
   - component: {fileID: 2120632194293578440}
   - component: {fileID: 8673868475789428346}
   - component: {fileID: 6737908646785993525}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Muscle_Wheel_fr
   m_TagString: Untagged
   m_Icon: {fileID: 0}

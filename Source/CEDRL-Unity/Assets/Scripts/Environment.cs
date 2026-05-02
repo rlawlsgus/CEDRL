@@ -9,7 +9,12 @@ public class AgentPointPair
 {
     public Transform startPoint;
     public Transform goalPoint;
+    public Vector3 manualStartPos;
+    public Quaternion manualStartRot = Quaternion.identity;
+    public Vector3 manualGoalPos;
     public float spawnTime = 0f;
+    public int groupId = 0;
+    public bool useManualPoints = false;
 }
 
 public class Environment : MonoBehaviour
@@ -29,12 +34,12 @@ public class Environment : MonoBehaviour
     private List<CEDRL_Agent> m_CEDRL_Agents;
     public float Height { get; set; }
     public Transform Floor { get; private set; }
-    private bool m_manualSpawning;
+    public bool m_manualSpawning;
     [SerializeField] private Vector4 m_floorEdges;
     
     [Header("Custom City Settings")]
     [SerializeField] private bool m_useDatasetInCustomCity; 
-    [SerializeField] private List<AgentPointPair> m_manualCityAgents;
+    public List<AgentPointPair> m_manualCityAgents;
     [SerializeField] private Transform m_agentRoot;
     [SerializeField] private Vector3 m_datasetPositionOffset; 
     [SerializeField] private Vector3 m_datasetScale = Vector3.one;
@@ -165,13 +170,18 @@ public class Environment : MonoBehaviour
         }
         else if (setup == SceneSetup.CustomCity && !m_useDatasetInCustomCity)
         {
+            m_manualSpawning = true;
+            Dictionary<int, List<CEDRL_Agent>> groupGroups = new Dictionary<int, List<CEDRL_Agent>>();
+
             for (int i = 0; i < m_manualCityAgents.Count; i++)
             {
                 var pair = m_manualCityAgents[i];
-                if (pair.startPoint == null || pair.goalPoint == null) continue;
+                Vector3 spawnPos = pair.useManualPoints ? pair.manualStartPos : (pair.startPoint != null ? pair.startPoint.position : Vector3.zero);
+                Quaternion spawnRot = pair.useManualPoints ? pair.manualStartRot : (pair.startPoint != null ? pair.startPoint.rotation : Quaternion.identity);
+                Vector3 goalPos = pair.useManualPoints ? pair.manualGoalPos : (pair.goalPoint != null ? pair.goalPoint.position : Vector3.zero);
 
-                GameObject agentObj = Instantiate(m_CEDRL_AgentInferencePrefab, pair.startPoint.position,
-                    pair.startPoint.rotation, parentTransform);
+                GameObject agentObj = Instantiate(m_CEDRL_AgentInferencePrefab, spawnPos,
+                    spawnRot, parentTransform);
                 agentObj.transform.localScale = new Vector3(agentScale, agentScale, agentScale);
                 var rvo = agentObj.GetComponent<RVOController>();
                 if(rvo != null) rvo.radius *= agentScale;
@@ -180,9 +190,38 @@ public class Environment : MonoBehaviour
                 agent.name = "CityAgent_" + i;
                 AgentScores dummyScores = new AgentScores { Norm_score = SceneManager.Instance.Complexity };
                 
-                agent.SetData(i, pair.spawnTime, pair.startPoint.position,
-                    pair.goalPoint.position, dummyScores, 0, this, null, setup, true);
+                agent.SetData(i, pair.spawnTime, spawnPos,
+                    goalPos, dummyScores, 0, this, null, setup, true);
+                
+                if (pair.groupId != 0)
+                {
+                    if (!groupGroups.ContainsKey(pair.groupId)) 
+                        groupGroups[pair.groupId] = new List<CEDRL_Agent>();
+                    groupGroups[pair.groupId].Add(agent);
+                }
+                
                 m_CEDRL_Agents.Add(agent);
+
+                // SpawnTime이 0이거나 현재 타임스텝보다 작으면 즉시 활성화
+                if (pair.spawnTime <= timestep)
+                {
+                    agent.gameObject.SetActive(true);
+                }
+            }
+
+            // Assign group members
+            foreach (var group in groupGroups.Values)
+            {
+                if (group.Count <= 1) continue;
+                foreach (var agent in group)
+                {
+                    foreach (var member in group)
+                    {
+                        if (agent == member) continue;
+                        if (!agent.groupMembers.Contains(member.transform))
+                            agent.groupMembers.Add(member.transform);
+                    }
+                }
             }
         }
         else if (setup == SceneSetup.Infinite)
@@ -368,8 +407,7 @@ public class Environment : MonoBehaviour
             m_envFrame += 1;
             if (SceneManager.Instance.IsInfernce)
             {
-                if(!m_manualSpawning)
-                    SpawnAgentsInTimestep();
+                SpawnAgentsInTimestep();
             }
 
             timestep += Time.fixedDeltaTime;

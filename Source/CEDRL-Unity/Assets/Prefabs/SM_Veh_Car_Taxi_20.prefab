@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7012029862224517596}
   - component: {fileID: 6781860506796207756}
   - component: {fileID: 7774818075673303873}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_Glass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 5334679065836520249}
   - component: {fileID: 4991435066057652832}
   - component: {fileID: 2413810204260279114}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_Wheel_fr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -201,9 +201,9 @@ GameObject:
   - component: {fileID: 448559271581851250}
   - component: {fileID: 1511354977494373362}
   - component: {fileID: 8923434247005540694}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_20
-  m_TagString: Vehicle
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -260,7 +260,7 @@ MonoBehaviour:
   stopDistance: 5
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 512
   rayOffset: {x: 0, y: 1, z: 0}
   currentSpeed: 0
   distanceTraveled: 0
@@ -342,7 +342,7 @@ GameObject:
   - component: {fileID: 3635120109052879325}
   - component: {fileID: 3298735213881517058}
   - component: {fileID: 3602208784006149414}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_Wheel_rr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -446,7 +446,7 @@ GameObject:
   - component: {fileID: 3153083599765193744}
   - component: {fileID: 9103494731928040018}
   - component: {fileID: 6109849502189512845}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_SteeringW
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -530,7 +530,7 @@ GameObject:
   - component: {fileID: 693617841547929369}
   - component: {fileID: 2516548943823475443}
   - component: {fileID: 7538402375208211872}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_Wheel_rl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -635,7 +635,7 @@ GameObject:
   - component: {fileID: 3623718368414239185}
   - component: {fileID: 1347581686402795700}
   - component: {fileID: 698341819022520265}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_Wheel_fl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -739,7 +739,7 @@ GameObject:
   - component: {fileID: 8302369890458135897}
   - component: {fileID: 5836870211215754776}
   - component: {fileID: 9179221826900050446}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Taxi_Plates
   m_TagString: Untagged
   m_Icon: {fileID: 0}

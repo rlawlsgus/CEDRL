@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8554211541853931533}
   - component: {fileID: 2643279733713738679}
   - component: {fileID: 169685060048856975}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_Wheel_rl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,9 +118,9 @@ GameObject:
   - component: {fileID: 4495119007358478748}
   - component: {fileID: 7320315401016393393}
   - component: {fileID: 2432292278507362525}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_07
-  m_TagString: Vehicle
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -178,7 +178,7 @@ MonoBehaviour:
   stopDistance: 5
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 512
   rayOffset: {x: 0, y: 1, z: 0}
   currentSpeed: 0
   distanceTraveled: 0
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 1174297814684851904}
   - component: {fileID: 7065282686285066086}
   - component: {fileID: 4482267058468476924}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_Glass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -342,7 +342,7 @@ GameObject:
   - component: {fileID: 8206242415861393270}
   - component: {fileID: 9108392433949589552}
   - component: {fileID: 7963729560946020774}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_SteeringW
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -425,7 +425,7 @@ GameObject:
   - component: {fileID: 4816131598846899389}
   - component: {fileID: 4715603230958253912}
   - component: {fileID: 784797437250575521}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_Plates
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -509,7 +509,7 @@ GameObject:
   - component: {fileID: 1208662481170676199}
   - component: {fileID: 5287002616350013781}
   - component: {fileID: 773505301917483080}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_Wheel_fl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -614,7 +614,7 @@ GameObject:
   - component: {fileID: 776300076319764955}
   - component: {fileID: 7599715152986884088}
   - component: {fileID: 200788706892565224}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_Wheel_fr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -719,7 +719,7 @@ GameObject:
   - component: {fileID: 1149806089470128357}
   - component: {fileID: 4655886315162921834}
   - component: {fileID: 2435124047433442607}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Car_Police_Wheel_rr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -823,7 +823,7 @@ GameObject:
   - component: {fileID: 1602119547698868616}
   - component: {fileID: 7526908699705964514}
   - component: {fileID: 1031194782370167488}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: SM_Veh_Steering_Wheel_09
   m_TagString: Untagged
   m_Icon: {fileID: 0}
