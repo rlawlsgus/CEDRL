@@ -14,6 +14,7 @@ public class AgentPointPair
     public Vector3 manualGoalPos;
     public float spawnTime = 0f;
     public int groupId = 0;
+    public int agentId = -1;
     public bool useManualPoints = false;
 }
 
@@ -288,6 +289,50 @@ public class Environment : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void AddManualAgents(List<AgentPointPair> newPairs)
+    {
+        if (newPairs == null || newPairs.Count == 0) return;
+        
+        Transform parentTransform = (m_agentRoot != null) ? m_agentRoot : transform.GetChild(2);
+        float agentScale = 0.7f;
+        m_manualSpawning = true;
+        
+        if (m_CEDRL_Agents == null) m_CEDRL_Agents = new List<CEDRL_Agent>();
+
+        foreach (var pair in newPairs)
+        {
+            Vector3 spawnPos = pair.useManualPoints ? pair.manualStartPos : (pair.startPoint != null ? pair.startPoint.position : Vector3.zero);
+            Quaternion spawnRot = pair.useManualPoints ? pair.manualStartRot : (pair.startPoint != null ? pair.startPoint.rotation : Quaternion.identity);
+            Vector3 goalPos = pair.useManualPoints ? pair.manualGoalPos : (pair.goalPoint != null ? pair.goalPoint.position : Vector3.zero);
+
+            GameObject agentObj = Instantiate(m_CEDRL_AgentInferencePrefab, spawnPos,
+                spawnRot, parentTransform);
+            agentObj.transform.localScale = new Vector3(agentScale, agentScale, agentScale);
+            var rvo = agentObj.GetComponent<RVOController>();
+            if(rvo != null) rvo.radius *= agentScale;
+
+            CEDRL_Agent agent = agentObj.GetComponent<CEDRL_Agent>();
+            // Since this might be called late, we use a unique ID based on total count
+            int nextId = m_manualCityAgents.Count;
+            agent.name = "CityAgent_" + nextId;
+            AgentScores dummyScores = new AgentScores { Norm_score = SceneManager.Instance.Complexity };
+            
+            agent.SetData(nextId, pair.spawnTime, spawnPos,
+                goalPos, dummyScores, 0, this, null, SceneSetup.CustomCity, true);
+            
+            m_CEDRL_Agents.Add(agent);
+            m_manualCityAgents.Add(pair);
+
+            // Immediate activation if spawn time has passed
+            if (pair.spawnTime <= timestep)
+            {
+                agent.gameObject.SetActive(true);
+            }
+        }
+        
+        Debug.Log($"[Environment] Dynamically added {newPairs.Count} manual agents.");
     }
 
     public bool OutsideInfiniteEnv(Vector3 pos)

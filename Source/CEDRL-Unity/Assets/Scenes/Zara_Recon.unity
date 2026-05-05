@@ -7579,7 +7579,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &167682374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17535,7 +17535,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &416887273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17550,6 +17550,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   searchInterval: 0.1
   agentRadius: 0.4
+  stopOnCollision: 0
   dangerZonesRoot: {fileID: 1453244353}
   obstaclesRoot: {fileID: 0}
   saveSubFolder: MetricsLogs
@@ -22094,6 +22095,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4642422675652786, guid: 6185dd6903d36e2458ab9d475a3382ee, type: 3}
   m_PrefabInstance: {fileID: 2037856446}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &524472680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 524472682}
+  - component: {fileID: 524472681}
+  m_Layer: 0
+  m_Name: Agent Spawn Manager_Big Group
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &524472681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524472680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04cb5d7a00d03094f8d95ce64831155c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentPrefab: {fileID: 8810509830346643669, guid: 9b3f633771e5ece46ac99993db89f4eb, type: 3}
+  scenarioJsonFile: {fileID: 4900000, guid: cac20953a7ebd334294b42400cc4d133, type: 3}
+  registerOnStart: 1
+--- !u!4 &524472682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524472680}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &532393562
 GameObject:
   m_ObjectHideFlags: 0
@@ -28256,8 +28304,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 721182773}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 31, z: 0}
+  m_LocalRotation: {x: 0.4694715, y: 0, z: 0, w: 0.8829476}
+  m_LocalPosition: {x: 0.86, y: 22.4, z: -20.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35832,7 +35880,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &928311244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45909,6 +45957,61 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4096458814454130, guid: 72c6642161c92fa4aa2c8b802372fd0f, type: 3}
   m_PrefabInstance: {fileID: 1200231232}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1201887560
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1201887562}
+  - component: {fileID: 1201887561}
+  m_Layer: 0
+  m_Name: PDM
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1201887561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201887560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 242630ff2f5aed34a9a114f246d7513a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  simulator: {fileID: 0}
+  evaluationInterval: 20
+  startIdx: 0
+  finalIdx: 10000
+  generateMap: 1
+  mapFileName: CEDRL_PDM_Map.png
+  mapResolution: 2048
+  mapSize: 100
+  gtColor: {r: 0, g: 0, b: 1, a: 1}
+  agentColor: {r: 1, g: 0, b: 0, a: 1}
+  obstacleColor: {r: 1, g: 0.5, b: 0, a: 1}
+--- !u!4 &1201887562
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201887560}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.6906447, y: 0.3335634, z: -0.5746552}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1209915483
 GameObject:
   m_ObjectHideFlags: 0
@@ -88207,7 +88310,9 @@ SceneRoots:
   - {fileID: 1426415248}
   - {fileID: 75655561}
   - {fileID: 351841902}
+  - {fileID: 524472682}
   - {fileID: 416887274}
   - {fileID: 928311245}
   - {fileID: 167682375}
   - {fileID: 1453244353}
+  - {fileID: 1201887562}

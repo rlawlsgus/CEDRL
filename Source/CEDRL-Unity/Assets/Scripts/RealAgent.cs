@@ -26,6 +26,7 @@ public class RealAgent : MonoBehaviour
     public Vector3 CurrentVelocity { get; private set; }
     public float CurrentSpeed { get; private set; }
     public float Progress { get; private set; }
+    public Vector3 GoalPos => m_env.AdjustHeight(positions[^1]);
 
     private void Awake()
     {

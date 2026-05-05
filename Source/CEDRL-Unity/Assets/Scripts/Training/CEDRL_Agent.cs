@@ -35,6 +35,9 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
     [Tooltip("Whether to receive observations from the real agent")]
     public bool receiveRealObs;
 
+    [Header("PDM Evaluation")]
+    public bool pdmMode;
+
     [Header("Debug")]
     [Tooltip("The current speed of the agent")]
     [SerializeField] private float m_currentSpeed;
@@ -59,6 +62,28 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
     [SerializeField] private bool m_goalReached;
     public bool GoalReached { get => m_goalReached; set => m_goalReached = value; }
     public Vector3 GoalPos => m_goalPos;
+
+    public void SetGoal(Vector3 goal)
+    {
+        m_goalPos = goal;
+        m_initialGoalDistance = Vector3.Distance(transform.position, goal);
+    }
+
+    public void ForceReset(Vector3 pos, Quaternion rot, Vector3 vel)
+    {
+        transform.position = pos;
+        transform.rotation = rot;
+        if (m_rb != null)
+        {
+            m_rb.velocity = vel;
+            m_rb.angularVelocity = Vector3.zero;
+        }
+        m_lastPos = pos;
+        
+        // ML-Agents internal state reset if needed
+        // Since we are doing a manual sync, we might not want to call EndEpisode here
+        // as it would trigger OnEpisodeBegin and potentially mess up the manual sync.
+    }
 
     private int m_episode = 0;
     private float m_initialGoalDistance;
@@ -353,7 +378,7 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
     {
         if (m_manager.IsInfernce)
         {
-            if (m_goalDistance <= 1f)
+            if (m_goalDistance <= 1f && !pdmMode)
             {
                 if (m_setup == SceneSetup.Infinite)
                 {

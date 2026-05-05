@@ -35,6 +35,8 @@ public class CEDRL_SRVRManager : MonoBehaviour
     [Tooltip("Interval in seconds to search for new agents.")]
     public float searchInterval = 0.5f;
     public float agentRadius = 0.4f;
+    [Tooltip("If true, stop recording and disable the agent immediately upon its first collision (excluding Danger Zones).")]
+    public bool stopOnCollision = false;
 
     [Header("Environment Settings")]
     public Transform dangerZonesRoot;
@@ -226,6 +228,7 @@ public class CEDRL_SRVRManager : MonoBehaviour
             if (hitDanger) data.dangerZoneTime += dt;
 
             // 2. Collision Check (SRVRManager.txt 원본 루틴 복구)
+            bool hitPhysicalObstacle = false;
             Collider[] nearby = Physics.OverlapSphere(agentColPos, agentRadius + 0.2f);
             foreach (var col in nearby)
             {
@@ -240,7 +243,10 @@ public class CEDRL_SRVRManager : MonoBehaviour
                         if (trackingData.TryGetValue(otherAgent.transform, out AgentTrackingData otherData))
                         {
                             if (col == otherData.agentCollider) 
+                            {
                                 data.agentCollisionTime += dt;
+                                hitPhysicalObstacle = true;
+                            }
                         }
                         continue;
                     }
@@ -252,11 +258,30 @@ public class CEDRL_SRVRManager : MonoBehaviour
                     int colLayer = col.gameObject.layer;
                     string layerName = LayerMask.LayerToName(colLayer);
 
-                    if (layerName.Contains("Vehicle") || col.GetComponentInParent<CarController>() != null) data.vehicleCollisionTime += dt;
-                    else if (layerName.Contains("Door")) data.doorCollisionTime += dt;
+                    if (layerName.Contains("Vehicle") || col.GetComponentInParent<CarController>() != null)
+                    {
+                        data.vehicleCollisionTime += dt;
+                        hitPhysicalObstacle = true;
+                    }
+                    else if (layerName.Contains("Door"))
+                    {
+                        data.doorCollisionTime += dt;
+                        hitPhysicalObstacle = true;
+                    }
                     else if (layerName.Contains("Obstacle") || layerName.Contains("Building") || obstacleColliders.Contains(col))
+                    {
                         data.staticObstacleTime += dt;
+                        hitPhysicalObstacle = true;
+                    }
                 }
+            }
+
+            if (stopOnCollision && hitPhysicalObstacle)
+            {
+                data.isFinished = true;
+                agentTransform.gameObject.SetActive(false);
+                if (verbose) Debug.Log($"<color=orange>[SRVR] Agent {data.agentComponent.id} stopped due to collision.</color>");
+                continue;
             }
 
             // Group Stats
