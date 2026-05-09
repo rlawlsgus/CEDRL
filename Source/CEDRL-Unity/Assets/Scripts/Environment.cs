@@ -40,7 +40,7 @@ public class Environment : MonoBehaviour
     
     [Header("Custom City Settings")]
     [SerializeField] private bool m_useDatasetInCustomCity; 
-    public List<AgentPointPair> m_manualCityAgents;
+    public List<AgentPointPair> m_manualCityAgents = new List<AgentPointPair>();
     [SerializeField] private Transform m_agentRoot;
     [SerializeField] private Vector3 m_datasetPositionOffset; 
     [SerializeField] private Vector3 m_datasetScale = Vector3.one;
@@ -310,6 +310,8 @@ public class Environment : MonoBehaviour
             GameObject agentObj = Instantiate(m_CEDRL_AgentInferencePrefab, spawnPos,
                 spawnRot, parentTransform);
             agentObj.transform.localScale = new Vector3(agentScale, agentScale, agentScale);
+            agentObj.transform.rotation = spawnRot; // Ensure rotation is set before script captures it
+
             var rvo = agentObj.GetComponent<RVOController>();
             if(rvo != null) rvo.radius *= agentScale;
 
@@ -432,14 +434,15 @@ public class Environment : MonoBehaviour
         {
             foreach (var agent in m_CEDRL_Agents)
             {
-                if(agent.enabled)
+                if(agent != null && agent.enabled)
                     agent.FinishEpisode(false);
             }
         }
         
         foreach (var agent in m_realAgents)
         {
-            agent.gameObject.SetActive(true);
+            if (agent != null)
+                agent.gameObject.SetActive(true);
         }
         ready = true;
         timestep = 0;
@@ -473,6 +476,12 @@ public class Environment : MonoBehaviour
         
         foreach(CEDRL_Agent agent in m_CEDRL_Agents)
         {
+            if (agent == null)
+            {
+                agentsToRemove.Add(agent);
+                continue;
+            }
+
             if (timestep >= agent.SpawnTimestep)
             {
                 agent.gameObject.SetActive(true);

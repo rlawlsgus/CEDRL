@@ -20,10 +20,6 @@ public class CEDRL_PDMManager : MonoBehaviour
     [Tooltip("How many frames between each rolling reset (PDM interval)")]
     public int evaluationInterval = 20; 
     
-    [Header("Agent Filter")]
-    public int startIdx = 0;
-    public int finalIdx = 10000;
-
     [Header("Map Generation")]
     public bool generateMap = true;
     public string mapFileName = "CEDRL_PDM_Map.png";
@@ -112,7 +108,7 @@ public class CEDRL_PDMManager : MonoBehaviour
             CEDRL_Agent[] allAgents = FindObjectsOfType<CEDRL_Agent>(true);
             foreach (var agent in allAgents)
             {
-                if (agent.name.StartsWith("CityAgent_"))
+                if (agent != null && agent.name.StartsWith("CityAgent_"))
                 {
                     if (agent.id >= 0 && agent.id < m_env.m_manualCityAgents.Count)
                     {
@@ -129,16 +125,15 @@ public class CEDRL_PDMManager : MonoBehaviour
         spawnInfos.Clear();
         foreach (Transform child in simulator.transform)
         {
-            if (child.name.StartsWith("ped_"))
+            if (child != null && child.name.StartsWith("ped_"))
             {
                 if (int.TryParse(child.name.Substring(4), out int id))
                 {
-                    if (id < startIdx || id > finalIdx) continue;
-                    
                     SpawnInfo info = new SpawnInfo
                     {
                         id = id,
                         startPos = child.position,
+                        startRot = child.rotation,
                         goalPos = simulator.GetFinalWorldPosition(id),
                         spawnTime = 999999f, 
                         groupId = 0
@@ -160,6 +155,7 @@ public class CEDRL_PDMManager : MonoBehaviour
             AgentPointPair pair = new AgentPointPair
             {
                 manualStartPos = info.startPos,
+                manualStartRot = info.startRot,
                 manualGoalPos = info.goalPos,
                 spawnTime = info.spawnTime,
                 agentId = info.id, 
@@ -186,7 +182,13 @@ public class CEDRL_PDMManager : MonoBehaviour
             int trajId = kvp.Key;
             CEDRL_Agent simAgent = kvp.Value;
 
-            if (simAgent != null && !simAgent.gameObject.activeInHierarchy)
+            if (simAgent == null)
+            {
+                trajIdsToRemoveFromInactive.Add(trajId);
+                continue;
+            }
+
+            if (!simAgent.gameObject.activeInHierarchy)
             {
                 GameObject gtObj = GameObject.Find("ped_" + trajId);
                 if (gtObj != null && gtObj.activeInHierarchy)
@@ -222,7 +224,7 @@ public class CEDRL_PDMManager : MonoBehaviour
             int simId = kvp.Key;
             AgentTrack track = kvp.Value;
 
-            if (track.simAgent == null || !track.simAgent.gameObject.activeInHierarchy || 
+            if (track == null || track.simAgent == null || !track.simAgent.gameObject.activeInHierarchy || 
                 track.gtTransform == null || !track.gtTransform.gameObject.activeInHierarchy)
             {
                 toRemove.Add(simId);
@@ -274,7 +276,7 @@ public class CEDRL_PDMManager : MonoBehaviour
         {
             if (activeTracks.TryGetValue(id, out var track))
             {
-                if (track.simAgent != null) track.simAgent.FinishEpisode(true);
+                if (track != null && track.simAgent != null) track.simAgent.FinishEpisode(true);
             }
             activeTracks.Remove(id);
         }
