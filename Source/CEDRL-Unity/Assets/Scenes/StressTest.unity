@@ -542,7 +542,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &181608295
 Transform:
   m_ObjectHideFlags: 0
@@ -1302,6 +1302,83 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 324586157}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &392834991
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 392834993}
+  - component: {fileID: 392834992}
+  m_Layer: 0
+  m_Name: SRVR
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &392834992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 392834991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1a1a322b5069214e9bb438023a7f598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentsRoot: {fileID: 1186836372}
+  searchInterval: 0.5
+  dangerZonesRoot: {fileID: 1749239653}
+  obstaclesRoot: {fileID: 762259130}
+  enableSocialContextMetrics: 1
+  useXZPlaneForSocialMetrics: 1
+  subtractApproxAgentRadiusFromNearestDistance: 0
+  ttcCollisionRadius: 0
+  lowTTCThreshold: 2
+  minRelativeSpeedForTTC: 0.05
+  maxTTCToRecord: 10
+  enableNavigationPerformanceMetrics: 1
+  useXZPlaneForPathLength: 1
+  continuePathLengthAfterGoal: 0
+  goalSuccessDistance: 1
+  useXZPlaneForGoalDistance: 1
+  enableSTEMetric: 1
+  steNormalizationMode: 2
+  sceneAverageTimeToGoalForSTE: 0
+  sceneAveragePathLengthForSTE: 0
+  rawSTEScale: 100
+  steDecimalPlaces: 3
+  enableTrajectoryMap: 1
+  mapResolution: 2048
+  mapWidth: 50
+  mapHeight: 50
+  normalPathColor: {r: 1, g: 0, b: 0, a: 1}
+  dangerPathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  dangerZoneOutlineColor: {r: 0, g: 0, b: 1, a: 1}
+  obstacleOutlineColor: {r: 1, g: 0.5, b: 0, a: 1}
+  mapFileName: SocialTrajectoryMap.png
+  minRecordDistance: 0.1
+  endPointRadius: 10
+--- !u!4 &392834993
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 392834991}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.26937008, y: -3.0565968, z: 3.9158068}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &411717849
 GameObject:
   m_ObjectHideFlags: 0
@@ -2583,7 +2660,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &762259130
 Transform:
   m_ObjectHideFlags: 0
@@ -3076,8 +3153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   environment: {fileID: 653480846}
-  scenario: 0
-  agentsPerGroup: 12
+  scenario: 1
+  agentsPerGroup: 9
   gridSpacing: 2
   densitySpawnCount: 50
   densityAreaSize: 30
@@ -4702,7 +4779,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1396330092
 Transform:
   m_ObjectHideFlags: 0
@@ -5550,7 +5627,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1749239653
 Transform:
   m_ObjectHideFlags: 0
@@ -6687,3 +6764,4 @@ SceneRoots:
   - {fileID: 2055585543}
   - {fileID: 1651842059}
   - {fileID: 1727170989}
+  - {fileID: 392834993}

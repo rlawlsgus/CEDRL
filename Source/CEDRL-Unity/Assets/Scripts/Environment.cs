@@ -291,10 +291,11 @@ public class Environment : MonoBehaviour
         }
     }
 
-    public void AddManualAgents(List<AgentPointPair> newPairs)
+    public List<CEDRL_Agent> AddManualAgents(List<AgentPointPair> newPairs)
     {
-        if (newPairs == null || newPairs.Count == 0) return;
+        if (newPairs == null || newPairs.Count == 0) return null;
         
+        List<CEDRL_Agent> createdAgents = new List<CEDRL_Agent>();
         Transform parentTransform = (m_agentRoot != null) ? m_agentRoot : transform.GetChild(2);
         float agentScale = 0.7f;
         m_manualSpawning = true;
@@ -325,6 +326,7 @@ public class Environment : MonoBehaviour
                 goalPos, dummyScores, 0, this, null, SceneSetup.CustomCity, true);
             
             m_CEDRL_Agents.Add(agent);
+            createdAgents.Add(agent);
             m_manualCityAgents.Add(pair);
 
             // Immediate activation if spawn time has passed
@@ -335,6 +337,7 @@ public class Environment : MonoBehaviour
         }
         
         Debug.Log($"[Environment] Dynamically added {newPairs.Count} manual agents.");
+        return createdAgents;
     }
 
     public bool OutsideInfiniteEnv(Vector3 pos)

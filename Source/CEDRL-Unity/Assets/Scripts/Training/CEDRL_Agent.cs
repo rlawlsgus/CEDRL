@@ -37,6 +37,7 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
 
     [Header("PDM Evaluation")]
     public bool pdmMode;
+    public bool disableOnGoal;
 
     [Header("Debug")]
     [Tooltip("The current speed of the agent")]
@@ -251,6 +252,11 @@ public class CEDRL_Agent : Unity.MLAgents.Agent
                 m_complexity = m_manager.Complexity;
 
             if (m_setup == SceneSetup.Infinite && m_env.OutsideInfiniteEnv(transform.position))
+            {
+                FinishEpisode(false);
+            }
+
+            if (disableOnGoal && m_goalDistance <= 1.0f)
             {
                 FinishEpisode(false);
             }
